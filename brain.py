@@ -236,11 +236,15 @@ def parse_dates(gdf):
     if all(col in gdf.columns for col in ["year1", "month", "day"]):
         final_date = date_from_split_columns(gdf)
         if DATE_COL in gdf.columns:
-            final_date = final_date.combine_first(standardise_date_series(gdf[DATE_COL]))
+            date_from_column = standardise_date_series(gdf[DATE_COL])
+            if date_from_column.notna().any():
+                final_date = final_date.combine_first(date_from_column)
         return apply_date_columns(gdf, final_date)
 
     if DATE_COL in gdf.columns:
-        return apply_date_columns(gdf, standardise_date_series(gdf[DATE_COL]))
+        date_from_column = standardise_date_series(gdf[DATE_COL])
+        if date_from_column.notna().any():
+            return apply_date_columns(gdf, date_from_column)
     return gdf
 
 
